@@ -10,6 +10,7 @@ export default async function () {
     .connect(config.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      dbName: "hexeel-dev"
     } as ConnectOptions)
     .then(() => {
       console.log(blue(`DB connected ✅`));

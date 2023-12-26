@@ -1,4 +1,4 @@
-import { Types, Document } from "mongoose";
+import mongoose, { Types, Document } from "mongoose";
 import { ReadStream } from "fs";
 import { Model } from "mongoose";
 
@@ -15,6 +15,11 @@ interface userI {
   password: string;
 }
 
+interface messageI {
+  content: string;
+}
+
+
 export interface IUserDocument extends userI, Document, ITimestamps {
   comparePassword(password: string): Promise<boolean>;
   getToken(): string;
@@ -22,6 +27,15 @@ export interface IUserDocument extends userI, Document, ITimestamps {
   role: string;
 }
 
+export interface IMessageDocument extends messageI, Document, ITimestamps {
+  senderId : mongoose.Types.ObjectId;
+  conversationId: mongoose.Types.ObjectId;
+}
+
+
+export interface IConversationDocument extends Document, ITimestamps {
+  members : mongoose.Types.ObjectId[];
+}
 export interface JwtPayload {
   id: string;
 }
