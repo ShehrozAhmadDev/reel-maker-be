@@ -5,6 +5,7 @@ import config from "./config";
 import database from "./database";
 import { blue, bold, yellow } from "colors";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 const app: Express = express();
 const PORT: number = parseInt(config.PORT as string, 10);
@@ -14,6 +15,10 @@ app.use(bodyParser.json({ limit: "30mb" }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 //Initialize Routes
 app.use("/api", apiRoutes);
+
+// Cors Policy
+app.use(cors({ origin: '*' }));
+
 
 //Database Connection
 database();
