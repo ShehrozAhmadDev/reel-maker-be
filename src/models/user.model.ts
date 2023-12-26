@@ -29,7 +29,7 @@ const userSchema = new Schema<IUserDocument>(
     },
     verified: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     role: {
       type: String,
