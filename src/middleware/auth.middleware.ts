@@ -8,7 +8,7 @@ export const verifyToken = async (req:Request, res: Response, next: NextFunction
   try {
     let token = req.header("Authorization");
     if (!token) {
-      res.status(403).send("Access Send");
+      res.status(403).send("Access Denied");
     }
     if (token && token.startsWith("Bearer ")) {
       token = token.slice(7, token.length).trimLeft();

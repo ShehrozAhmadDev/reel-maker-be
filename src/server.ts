@@ -7,14 +7,24 @@ import { blue, bold, yellow } from "colors";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
+import { Server } from "socket.io";
+import initializeSocket from "./socket";
+
 
 const app: Express = express();
 const PORT: number = parseInt(config.PORT as string, 10);
 
 const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+})
 app.use(bodyParser.json({ limit: "30mb" }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-//Initialize Routes
 
 
 //Logger
@@ -29,7 +39,11 @@ app.options('*', cors());
 //Database Connection
 database();
 
+
+//Initialize Routes
 app.use("/api", apiRoutes);
+
+initializeSocket(io);
 
 //Listening to PORT
 server.listen(PORT, (): void =>

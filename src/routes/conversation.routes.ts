@@ -5,6 +5,6 @@ import { createConversation, getConversation } from "../controllers/conversation
 const router: Router = Router();
 
 router.post("/", verifyToken, catchErrors(createConversation));
-router.post("/:userId", verifyToken, catchErrors(getConversation));
+router.get("/:userId", verifyToken, catchErrors(getConversation));
 
 export default router;

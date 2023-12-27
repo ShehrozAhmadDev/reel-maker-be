@@ -5,7 +5,7 @@ const messageSchema = new Schema<IMessageDocument>(
   {
     senderId: {  type: Schema.Types.ObjectId, ref: "User"},
     conversationId: {  type: Schema.Types.ObjectId, ref: "Conversation"},
-    content: {type: String}
+    text: {type: String}
   },
   { timestamps: true, bufferTimeoutMS: 50000 }
 );

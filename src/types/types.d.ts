@@ -16,7 +16,7 @@ interface userI {
 }
 
 interface messageI {
-  content: string;
+  text: string;
 }
 
 
