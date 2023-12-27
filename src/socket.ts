@@ -2,24 +2,28 @@
 
 import { Server, Socket } from "socket.io";
 
-interface SocketUser {
-  userId: string;
-  socketId: string;
-}
-
-let users: SocketUser[] = [];
+// interface SocketUser {
+//   userId: string;
+//   socketId: string;
+// }
+const usersMap = new Map<string, string>(); // userId -> socketId
 
 const addUser = (userId: string, socketId: string) => {
-  !users.some((user) => user.userId === userId) &&
-    users.push({ userId, socketId });
+  usersMap.set(userId, socketId);
 };
 
 const removeUser = (socketId: string) => {
-  users = users.filter((user) => user.socketId !== socketId);
+  for (const [userId, id] of usersMap.entries()) {
+    if (id === socketId) {
+      usersMap.delete(userId);
+      break;
+    }
+  }
 };
 
 const getUser = (userId: string) => {
-  return users.find((user) => user.userId === userId);
+  const socketId = usersMap.get(userId);
+  return socketId ? { userId, socketId } : null;
 };
 
 const initializeSocket = (io: Server) => {
@@ -30,7 +34,7 @@ const initializeSocket = (io: Server) => {
     // take userId and socketId from user
     socket.on("addUser", (userId: string) => {
       addUser(userId, socket.id);
-      io.emit("getUsers", users);
+      io.emit("getUsers", usersMap);
     });
 
     // send and get message
@@ -48,7 +52,7 @@ const initializeSocket = (io: Server) => {
     socket.on("disconnect", () => {
       console.log("a user disconnected!");
       removeUser(socket.id);
-      io.emit("getUsers", users);
+      io.emit("getUsers", usersMap);
     });
   });
 };
