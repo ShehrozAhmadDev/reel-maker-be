@@ -37,7 +37,7 @@ export const verifyIsAdmin = async (req:Request, res: Response, next: NextFuncti
       next();
     }
     else{
-      res.status(400).json({message: "You dont have access to this function"})
+      res.status(400).json({message: "You dont have access to this route"})
     }
   } catch (error: any) {
     console.log(error);

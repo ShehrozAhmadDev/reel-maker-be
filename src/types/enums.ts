@@ -2,6 +2,7 @@ export enum Status {
     PENDING = "pending",
     APPROVED = "approved",
     REJECTED = "rejected",
+    EXPIRED = "expired"
   }
   
   export enum Roles {
@@ -9,3 +10,4 @@ export enum Status {
     USER = "user",
     DESIGNER = "designer"
   }
+

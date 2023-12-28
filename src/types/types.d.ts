@@ -31,6 +31,32 @@ export interface IMessageDocument extends messageI, Document, ITimestamps {
   senderId : mongoose.Types.ObjectId;
   conversationId: mongoose.Types.ObjectId;
 }
+export interface IPlanDocument extends  Document, ITimestamps {
+  title : string;
+  description: string;
+  price: number;
+  noOfVideos: number;
+  duration: number;
+}
+
+
+export interface IUserPlanDocument extends  Document, ITimestamps {
+  planId : mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  status: string;
+  noOfVideosRemaining: number;
+  paymentStatus: string;
+  expiryDate: Date;
+}
+
+export interface IProjectDocument extends  Document, ITimestamps {
+  title : string;
+  description: string;
+  link: string;
+  userPlan:  mongoose.Types.ObjectId;
+}
+
+
 
 
 export interface IConversationDocument extends Document, ITimestamps {
