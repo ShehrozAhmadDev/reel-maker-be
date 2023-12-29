@@ -6,7 +6,8 @@ const projectSchema = new Schema<IProjectDocument>(
     title: { type: String, require: true },
     description: { type: String },
     link: { type: String },
-    userPlan: {type: Schema.Types.ObjectId, ref: "UserPlan"}
+    userPlan: {type: Schema.Types.ObjectId, ref: "UserPlan"},
+    createdBy: {type: Schema.Types.ObjectId, ref: "User"}
   },
   { timestamps: true, bufferTimeoutMS: 50000 }
 );

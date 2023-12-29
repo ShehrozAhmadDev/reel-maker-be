@@ -10,13 +10,13 @@ export const createProject = async (req: Request, res: Response) => {
 
 // Get all projects
 export const getAllProjects = async (_req: Request, res: Response) => {
-    const projects = await Project.find();
+    const projects = await Project.find().populate("createdBy");
     res.status(200).json(projects);
 };
 
 // Get project by ID
 export const getProjectById = async (req: Request, res: Response) => {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id).populate("createdBy");
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
     }

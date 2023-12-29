@@ -54,6 +54,7 @@ export interface IProjectDocument extends  Document, ITimestamps {
   description: string;
   link: string;
   userPlan:  mongoose.Types.ObjectId;
+  createdBy:mongoose.Types.ObjectId;
 }
 
 

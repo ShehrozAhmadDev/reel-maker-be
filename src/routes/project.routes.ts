@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { catchErrors } from "../middleware/error.middleware";
-import { verifyToken } from "../middleware/auth.middleware";
+import {  verifyToken } from "../middleware/auth.middleware";
 import {
     createProject,
     getAllProjects,
