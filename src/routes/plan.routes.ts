@@ -8,7 +8,7 @@ const router: Router = Router();
 router.post('/',verifyToken, catchErrors(createPlan));
 
 // Get all plans
-router.get('/',verifyToken, catchErrors(getAllPlans));
+router.get('/', catchErrors(getAllPlans));
 
 // Get plan by ID
 router.get('/:id',verifyToken ,catchErrors(getPlanById));
