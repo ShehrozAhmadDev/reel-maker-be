@@ -10,8 +10,8 @@ export const createPlan = async (req: Request, res: Response) => {
 
 // Get all Plans
 export const getAllPlans = async (_req: Request, res: Response) => {
-    const Plans = await Plan.find()
-    res.status(200).json(Plans);
+    const plans = await Plan.find()
+    res.status(200).json({data: plans, status: 200});
 };
 
 // Get Plan by ID
@@ -20,7 +20,7 @@ export const getPlanById = async (req: Request, res: Response) => {
     if (!plan) {
       return res.status(404).json({ error: 'Plan not found' });
     }
-    res.status(200).json(plan);
+    res.status(200).json({data: plan, status: 200});
 };
 
 // Update Plan by ID
