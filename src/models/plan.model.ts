@@ -8,7 +8,7 @@ const planSchema = new Schema<IPlanDocument>(
     price: { type: Number },
     noOfVideos: { type: Number },
     duration: { type: Number },
-    
+    features: [{type: String}],
   },
   { timestamps: true, bufferTimeoutMS: 50000 }
 );

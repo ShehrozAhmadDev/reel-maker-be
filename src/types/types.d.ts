@@ -37,6 +37,7 @@ export interface IPlanDocument extends  Document, ITimestamps {
   price: number;
   noOfVideos: number;
   duration: number;
+  features: string[];
 }
 
 
