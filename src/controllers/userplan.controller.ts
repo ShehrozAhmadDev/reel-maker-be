@@ -1,86 +1,147 @@
-// controllers/userPlanController.ts
 import { Request, Response } from "express";
-import { Status } from "../types/enums";
-import { UserPlan } from "../models";
 import stripe from "stripe"; 
+import Config from "../config";
+import { User } from "../models";
 
-const stripeSecretKey = "your_stripe_secret_key"; 
-const stripeWebhookSecret = "your_stripe_webhook_secret";
-const stripeClient = new stripe(stripeSecretKey);
+const stripeWebhookSecret = Config.STRIPE_SECRET_KEY || "";
+const stripeClient = new stripe(stripeWebhookSecret);
 
-export const createPaymentIntent = async (req: Request, res: Response) => {
-  try {
-    // Add your Stripe logic here to create a PaymentIntent
-    // Retrieve the plan details and user information from req.body
-    // Use Stripe SDK to create a PaymentIntent
 
-    // Example:
-    // const paymentIntent = await stripe.paymentIntents.create({
-    //   amount: req.body.amount,
-    //   currency: req.body.currency,
-    //   // Add other necessary fields
-    // });
 
-    // Create a user plan in your MongoDB after successful payment
-    const userPlan = new UserPlan({
-      planId: req.body.planId,
-      userId: req.body.userId,
-      status: Status.PENDING,
-      noOfVideosRemaining: 0, 
-      paymentStatus: Status.PENDING,
-      expiryDate: null, 
+export const getPlans =async (_req: Request, res: Response) => {
+    const products = await stripeClient.products.list({
+      expand: ['data.default_price']
     });
+    console.log(products);
+    const mappedProducts = products.data.map((product: any)=>{
+      return {
+        title: product.name,
+        features: product.features.map((feature: any)=> feature.name) ,
+        price: product.default_price?.unit_amount ,
+        priceId: product.default_price?.id,
+        productId: product.id ,
+      }
+    })
+    res.send({
+      products: mappedProducts,
+    });
+  };
 
-    await userPlan.save();
 
-    res.status(200).json({ message: "PaymentIntent created successfully", userPlan });
-  } catch (error) {
-    console.error("Error creating PaymentIntent:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
+  export const createCustomer = async (req: Request, res: Response) => {
+    try {
+      const user = await User.findById(req.user?.id);
+      let stripeCustomerId = "";
+      if (user) {
+        if (user.stripeId) {
+          stripeCustomerId = user.stripeId;
+        } else {
+          const customer = await stripeClient.customers.create({
+            email: user.email,
+            name: user.fullName,
+          });
+  
+         const updatedUser = await User.findByIdAndUpdate(user._id,{stripeId: customer.id},{new: true});
+          stripeCustomerId = updatedUser?.stripeId || "";
+        }
+      }
+      res.cookie('customer', stripeCustomerId, { maxAge: 900000, httpOnly: true });
+      res.status(200).send({ customer: stripeCustomerId });
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+  
 
-export const handleWebhook = async (req: Request, res: Response) => {
-  const payload = req.body;
-  const sig = req.headers["stripe-signature"] as string;
 
-  let event: stripe.Event;
+  export const createSubscription =async (req: Request, res: Response) => {
+    const {customerId, priceId} = req.body;
+      const subscription = await stripeClient.subscriptions.create({
+        customer: customerId,
+        items: [{
+          price: priceId,
+        }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+      });
+      if (subscription.latest_invoice && typeof subscription.latest_invoice === 'object') {
+        const invoice = subscription.latest_invoice as stripe.Invoice;
+  
+        if (invoice.payment_intent && typeof invoice.payment_intent === 'object') {
+          const paymentIntent: stripe.PaymentIntent = invoice.payment_intent as stripe.PaymentIntent;
+          if(req.user){
+            await User.findByIdAndUpdate(req.user.id,{subscriptionId: subscription.id},{new: true});
+          }
+          if (paymentIntent.client_secret) {
+            res.send({
+              subscriptionId: subscription.id,
+              clientSecret: paymentIntent.client_secret,
+            });
+            return;
+          }
+        }
+      }
+  };
 
-  try {
-    event = stripeClient.webhooks.constructEvent(payload, sig, stripeWebhookSecret);
-  } catch (err: any) {
-    console.error("Error verifying webhook signature:", err);
-    return res.status(400).json({ message: "Webhook signature verification failed" });
-  }
 
-  // Handle different events
-  switch (event.type) {
-    case "payment_intent.succeeded":
-    //   const paymentIntent = event.data.object as stripe.PaymentIntent;
-      // Handle successful payment event
-      // Update user plan status, paymentStatus, and expiryDate in MongoDB
-      // Example: 
-      // const userPlan = await UserPlan.findOneAndUpdate(
-      //   { paymentIntentId: paymentIntent.id },
-      //   {
-      //     status: Status.APPROVED,
-      //     paymentStatus: Status.APPROVED,
-      //     expiryDate: new Date(), // Set the actual expiry date based on your business logic
-      //   },
-      //   { new: true }
-      // );
-      break;
-    
-    case "payment_intent.payment_failed":
-      // Handle payment failure event
-      // Update user plan status and paymentStatus in MongoDB
-      break;
+  export const updateSubscription =async (req: Request, res: Response) => {
+      const subscription = await stripeClient.subscriptions.retrieve(
+        req.body.subscriptionId
+      );
+      const updatedSubscription = await stripeClient.subscriptions.update(
+        req.body.subscriptionId, {
+          items: [{
+            id: subscription.items.data[0].id,
+            price: req.body.priceId,
+          }],
+          expand: ['latest_invoice.payment_intent'],
+        }
+      );
 
-    // Add more cases for other relevant events as needed
+        const invoice = updatedSubscription.latest_invoice as stripe.Invoice;
+        const paymentIntent: stripe.PaymentIntent = invoice.payment_intent as stripe.PaymentIntent;
+        console.log(paymentIntent)
+          if (paymentIntent.client_secret) {
+            res.send({
+              subscriptionId: updatedSubscription.id,
+              clientSecret: paymentIntent.client_secret,
+            });
+            return;
+          }
+    }
 
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
-  }
 
-  res.status(200).json({ received: true });
-};
+
+    export const getUserSubscriptions = async (req: Request, res: Response)=>{
+      const customerId = req.params.customerId;
+
+      const subscriptions = await stripeClient.subscriptions.list({
+        customer: customerId,
+        status: 'all',
+        expand: ['data.default_payment_method'],
+      });
+      const mappedSubscriptions = subscriptions.data.map((subscription)=>{
+        return {
+          subId: subscription.id,
+          startDate: subscription.current_period_start ,
+          endDate: subscription.current_period_end,
+          customerId: subscription.customer,
+          productId: subscription.items.data[0].plan.product,
+          priceId: subscription.items.data[0].plan.id,
+        }
+      })
+      res.status(200).json(mappedSubscriptions);
+    }
+
+    export const cancelSubscription = async (req: Request, res: Response)=>{
+      const subscriptionId = req.params.subscriptionId;
+      const deletedSubscription = await stripeClient.subscriptions.cancel(subscriptionId)
+      if(deletedSubscription){
+        await User.findByIdAndUpdate(req.user?.id, {subscriptionId: ""},{new: true});
+        res.status(200).json({ status: 200, subscription: deletedSubscription });
+      }
+      else{
+        res.status(400).json({ message: "No Subscription Found" });
+      }
+    }

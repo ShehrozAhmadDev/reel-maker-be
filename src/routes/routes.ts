@@ -5,6 +5,7 @@ import conversationRoutes from "./conversation.routes";
 import messageRoutes from "./message.routes";
 import projectRoutes from "./project.routes";
 import planRoutes from "./plan.routes";
+import userplanRoutes from "./userplan.routes";
 
 const router: Router = Router();
 
@@ -14,6 +15,6 @@ router.use("/conversation", conversationRoutes);
 router.use("/message", messageRoutes);
 router.use("/project", projectRoutes);
 router.use("/plan", planRoutes);
-
+router.use("/userplan", userplanRoutes);
 
 export default router;

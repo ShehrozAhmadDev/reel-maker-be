@@ -17,10 +17,11 @@ const userSchema = new Schema<IUserDocument>(
       },
       required: [true, "Email is required"],
     },
+    stripeId: {type: String},
+    subscriptionId: {type: String},
     password: {
       type: String,
       minlength: 8,
-      maxlength: 20,
       validate: {
         validator: passwordValidator,
         message: (props: any) =>

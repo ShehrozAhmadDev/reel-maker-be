@@ -25,6 +25,8 @@ export interface IUserDocument extends userI, Document, ITimestamps {
   getToken(): string;
   verified: boolean;
   role: string;
+  stripeId: string;
+  subscriptionId: string;
 }
 
 export interface IMessageDocument extends messageI, Document, ITimestamps {

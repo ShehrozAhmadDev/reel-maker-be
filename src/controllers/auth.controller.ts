@@ -28,7 +28,9 @@ export const login = async (req: Request, res: Response) => {
     email: user.email,
     fullName: user.fullName,
     role: user.role,
-    _id: user._id
+    _id: user._id,
+    stripeId: user.stripeId,
+    subscriptionId: user.subscriptionId
   });
 };
 
