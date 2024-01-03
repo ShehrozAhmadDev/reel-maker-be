@@ -1,7 +1,7 @@
 import  User from "../models/user.model";
 import validator from "validator";
 
-export const userFind = (data: object) => User.findOne(data).select('-password').populate("subscriptionId");
+export const userFind = (data: object) => User.findOne(data).populate("subscriptionId");
 
 export const userFindById = (id?: string) => User.findById(id).select('-password').populate("subscriptionId");
 

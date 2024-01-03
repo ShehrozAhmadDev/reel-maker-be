@@ -3,15 +3,13 @@ import { userFind, userExists, validateEmail } from "../helpers";
 import { User } from "../models";
 import { IUserDocument } from "../types/types";
 
-/**
- * Login user and returns jwt token of user
- */
+
 export const login = async (req: Request, res: Response) => {
   const { email, password }: { email: string; password: string } = req?.body;
-
   const user = await userFind({
-    email: email.toLowerCase(),
+    email: email,
   });
+
   if (!user) {
     return res.status(401).json({ message: "User not exists on this email" });
   }
@@ -28,7 +26,7 @@ export const login = async (req: Request, res: Response) => {
     status: 200,
     message: "Logged In",
     token,
-    user: user,
+    user: user
   });
 };
 

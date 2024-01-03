@@ -6,7 +6,6 @@ import database from "./database";
 import { blue, bold, yellow } from "colors";
 import bodyParser from "body-parser";
 import cors from "cors";
-import morgan from "morgan";
 import { Server } from "socket.io";
 import initializeSocket from "./socket";
 
@@ -27,8 +26,7 @@ app.use(bodyParser.json({ limit: "30mb" }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
 
-//Logger
-morgan(':method :url :status :res[content-length] - :response-time ms')
+
 
 
 // Cors Policy
