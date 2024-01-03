@@ -108,14 +108,15 @@ export const createSubscription = async (req: Request, res: Response) => {
       expiryDate: new Date(subscription.current_period_end * 1000),
     });
     await newSubscription.save();
+    await User.findByIdAndUpdate(req.user?.id, {subscriptionId: newSubscription._id });
   }
-  const updatedUser = await userFindById(req.user?.id);
+  const updatedUser = await userFindById(req.user?.id).populate("subscriptionId");
 
   res.status(200).json({
     status: 200,
     subscriptionId: subscription.id,
     clientSecret: paymentIntent.client_secret,
-    user: updatedUser,
+    user: updatedUser
   });
 };
 
