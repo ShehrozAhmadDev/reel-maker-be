@@ -18,7 +18,7 @@ const userSchema = new Schema<IUserDocument>(
       required: [true, "Email is required"],
     },
     stripeId: {type: String},
-    subscriptionId: {type: String},
+    subscriptionId: { type: Schema.Types.ObjectId, ref: "Subscription"},
     password: {
       type: String,
       minlength: 8,
@@ -61,6 +61,11 @@ userSchema.methods.getToken = function () {
   return sign({ id: this._id }, Config.JWT_SECRET as string, {
     expiresIn: Config.JWT_EXPIRE_TIME,
   });
+};
+
+
+userSchema.methods.populateSubscription = async function () {
+  await this.populate('subscriptionId').execPopulate();
 };
 
 const User = model<IUserDocument>("User", userSchema);

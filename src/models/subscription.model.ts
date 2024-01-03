@@ -1,14 +1,16 @@
 import { model, Schema } from "mongoose";
-import { IUserPlanDocument } from "../types/types";
 import { Status } from "../types/enums";
+import { ISubscriptionDocument } from "../types/types";
 
-const userPlanSchema = new Schema<IUserPlanDocument>(
+const subscriptionSchema = new Schema<ISubscriptionDocument>(
   {
-    planId: { type: Schema.Types.ObjectId, ref: "Plan" },
+    subscriptionId: {type: String},
+    planId: { type: String },
+    priceId: {type: String},
     userId: { type: Schema.Types.ObjectId, ref: "User" },
     status: {
       type: String,
-      enum: [Status.PENDING, Status.APPROVED, Status.EXPIRED],
+      enum: [Status.PENDING, Status.APPROVED, Status.EXPIRED, Status.CANCELLED],
       default: Status.PENDING,
     },
     noOfVideosRemaining: { type: Number },
@@ -22,6 +24,6 @@ const userPlanSchema = new Schema<IUserPlanDocument>(
   { timestamps: true, bufferTimeoutMS: 50000 }
 );
 
-const UserPlan = model<IUserPlanDocument>("UserPlan", userPlanSchema);
+const SubscriptionPlan = model<ISubscriptionDocument>("Subscription", subscriptionSchema);
 
-export default UserPlan;
+export default SubscriptionPlan;

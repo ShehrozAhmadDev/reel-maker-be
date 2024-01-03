@@ -26,9 +26,8 @@ export interface IUserDocument extends userI, Document, ITimestamps {
   verified: boolean;
   role: string;
   stripeId: string;
-  subscriptionId: string;
+  subscriptionId: mongoose.Types.ObjectId  | ISubscriptionDocument;
 }
-
 export interface IMessageDocument extends messageI, Document, ITimestamps {
   senderId : mongoose.Types.ObjectId;
   conversationId: mongoose.Types.ObjectId;
@@ -43,8 +42,10 @@ export interface IPlanDocument extends  Document, ITimestamps {
 }
 
 
-export interface IUserPlanDocument extends  Document, ITimestamps {
-  planId : mongoose.Types.ObjectId;
+export interface ISubscriptionDocument extends  Document, ITimestamps {
+  subscriptionId: string;
+  planId : string;
+  priceId: string;
   userId: mongoose.Types.ObjectId;
   status: string;
   noOfVideosRemaining: number;

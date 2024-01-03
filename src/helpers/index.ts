@@ -1,7 +1,9 @@
 import  User from "../models/user.model";
 import validator from "validator";
 
-export const userFind = (data: object) => User.findOne(data);
+export const userFind = (data: object) => User.findOne(data).select('-password').populate("subscriptionId");
+
+export const userFindById = (id?: string) => User.findById(id).select('-password').populate("subscriptionId");
 
 export const userExists = (email: string) => User.exists({ email });
 

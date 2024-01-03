@@ -3,6 +3,9 @@ import { userFind, userExists, validateEmail } from "../helpers";
 import { User } from "../models";
 import { IUserDocument } from "../types/types";
 
+/**
+ * Login user and returns jwt token of user
+ */
 export const login = async (req: Request, res: Response) => {
   const { email, password }: { email: string; password: string } = req?.body;
 
@@ -25,12 +28,7 @@ export const login = async (req: Request, res: Response) => {
     status: 200,
     message: "Logged In",
     token,
-    email: user.email,
-    fullName: user.fullName,
-    role: user.role,
-    _id: user._id,
-    stripeId: user.stripeId,
-    subscriptionId: user.subscriptionId
+    user: user,
   });
 };
 
@@ -68,7 +66,7 @@ export const signUp = async (req: Request, res: Response) => {
   return res.status(200).json({
     status: 200,
     message: `User signed up successfully, ${email}`,
-    user: user
+    user: user,
   });
 };
 
@@ -82,5 +80,3 @@ export const myProfile = async (
   const user = await User.findById(req?.user?._id).select("-password");
   return res.status(200).json({ user });
 };
-
-
