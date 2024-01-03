@@ -203,7 +203,6 @@ export const cancelSubscription = async (req: Request, res: Response) => {
  * Resume subscription of user
  *
  */
-
 export const resumeSubscription = async (req: Request, res: Response) => {
   const subscriptionId = req.params.subscriptionId;
 
@@ -220,6 +219,16 @@ export const resumeSubscription = async (req: Request, res: Response) => {
       { status: Status.CANCELLED }
     );
     res.status(200).json({ status: 200, subscription: updatedSubscription });
+  } else {
+    res.status(400).json({ message: "No Subscription Found" });
+  }
+};
+
+export const approvePayment = async (req: Request, res: Response) => {
+  const subscriptionId = req.params.subscriptionId;
+  const subscription = await Subscription.findByIdAndUpdate(subscriptionId, {status: Status.APPROVED, paymentStatus: Status.APPROVED}, {new: true});
+  if (subscription) {
+    res.status(200).json({ status: 200, subscription: subscription });
   } else {
     res.status(400).json({ message: "No Subscription Found" });
   }
