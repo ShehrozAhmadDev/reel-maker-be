@@ -5,6 +5,6 @@ import { verifyToken } from "../middleware/auth.middleware";
 const router: Router = Router();
 
 //Get Home
-router.get("/me", verifyToken,catchErrors(myProfile));
+router.get("/", verifyToken,catchErrors(myProfile));
 
 export default router;

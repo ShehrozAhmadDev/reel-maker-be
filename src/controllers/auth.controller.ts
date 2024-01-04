@@ -75,6 +75,8 @@ export const myProfile = async (
   req: Request,
   res: Response
 ): Promise<Response<IUserDocument>> => {
-  const user = await User.findById(req?.user?._id).select("-password");
-  return res.status(200).json({ user });
+  const user = await User.findById(req?.user?._id)
+    .select("-password")
+    .populate("subscriptionId");
+  return res.status(200).json({ user, status: 200 });
 };
