@@ -183,19 +183,28 @@ export const getUserSubscriptions = async (req: Request, res: Response) => {
  */
 export const cancelSubscription = async (req: Request, res: Response) => {
   const subscriptionId = req.params.subscriptionId;
+  const subscription = await Subscription.findById(subscriptionId);
+  if(subscription){
+  if( subscription.status!==Status.APPROVED){
+    res.status(200).json({message: "No Subscription exist"})
+  }
   const deletedSubscription = await stripeClient.subscriptions.cancel(
-    subscriptionId
+    subscription.subscriptionId
   );
   if (deletedSubscription) {
-    const user = await userFindById(req.user?.id);
-    const updatedSubscription = Subscription.findByIdAndUpdate(
-      user?.subscriptionId._id,
-      { status: Status.CANCELLED }
+    console.log(deletedSubscription)
+    const updatedSubscription = await Subscription.findByIdAndUpdate(
+      subscriptionId,
+      { status: Status.CANCELLED }, {new: true}
     );
     res.status(200).json({ status: 200, subscription: updatedSubscription });
   } else {
-    res.status(400).json({ message: "No Subscription Found" });
+    res.status(400).json({ message: "No Subscription Found from Stripe" });
   }
+}
+else{
+  res.status(400).json({ message: "No Subscription Found" });
+}
 };
 
 
